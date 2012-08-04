@@ -13,7 +13,7 @@ each pair. Its main use is for testing filter functions produce expected output.
     use Test::Corpus;
     use Test;
     use Foo;
-    Test::Corpus::run-tests(Test::Corpus::default-test(&rot13));
+    run-tests(simple-test(&rot13));
 
     # directory structure (assuming default settings):
     ./
