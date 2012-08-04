@@ -6,6 +6,13 @@ sub basename {
     ($*PROGRAM_NAME ~~ m{ '/' (<-[/]>+) $ })[0];
 }
 
+#= Convenience function for your currying amusement
+our sub default-test(&function) {
+    return sub ($in, $out, $filename) {
+        is &function($in.slurp), $out.slurp, $filename;
+    }
+}
+
 #= Runs tests on a callback, which gets passed input/output filehandles, and the
 #  file basename of each.
 our sub run-tests(
