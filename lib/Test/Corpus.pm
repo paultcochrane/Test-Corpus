@@ -3,20 +3,21 @@ use Test;
 
 # Get the name of the *.t file being run, and trim directory parts from it.
 sub basename {
+    # TODO once niecza supports it: return IO::Path($*PROGRAM_NAME).basename;
     ($*PROGRAM_NAME ~~ m{ '/' (<-[/]>+) $ })[0];
 }
 
 # Convenience function for your currying amusement
-sub simple-test(Callable $function) is export {
+sub simple-test(&func) is export {
     return sub ($in, $out, $filename) {
-        is $function($in.slurp), $out.slurp, $filename;
+        is &func($in.slurp), $out.slurp, $filename;
     }
 }
 
 # Runs tests on a callback, which gets passed input/output filehandles, and the
 # file basename of each.
 sub run-tests(
-    Callable $test-block,
+    &test,
     Str :$input-dir = "t_files/{basename}.input",
     Str :$output-dir = "t_files/{basename}.output",
     Int :$tests-per-block = 1,
@@ -29,7 +30,7 @@ sub run-tests(
         my $in = open("$input-dir/$filename");
         my $out = open("$output-dir/$filename");
 
-        $test-block($in, $out, $filename);
+        &test($in, $out, $filename);
     }
 }
 
