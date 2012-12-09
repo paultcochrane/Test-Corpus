@@ -1,6 +1,6 @@
 {
     "name"          : "Test-Corpus",
-    "version"       : "*",
+    "version"       : "1.0.0",
     "description"   : "Run a test function against a directory of input and expected output files",
     "depends"       : [],
     "source-url"    : "git://github.com/flussence/Test-Corpus.git"

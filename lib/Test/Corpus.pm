@@ -1,25 +1,28 @@
-module Test::Corpus;
+module Test::Corpus:auth<github:flussence>:ver<1.0.0>;
 use Test;
 
-# Get the name of the *.t file being run, and trim directory parts from it.
-sub basename {
-    # TODO once niecza supports it: return IO::Path($*PROGRAM_NAME).basename;
-    ($*PROGRAM_NAME ~~ m{ '/' (<-[/]>+) $ })[0];
+sub test-basename {
+    # <!--[if IE]>
+    return ($*PROGRAM_NAME ~~ m{ '/' (<-[/]>+) $ })[0]
+        if $*EXECUTABLE_NAME ~~ /Niecza/;
+    # <![end if]-->
+
+    return $*PROGRAM_NAME.path.basename;
 }
 
-# Convenience function for your currying amusement
+# Convenience sub for testing filter functions of arity 1
 sub simple-test(&func) is export {
     return sub ($in, $out, $filename) {
         is &func($in.slurp), $out.slurp, $filename;
     }
 }
 
-# Runs tests on a callback, which gets passed input/output filehandles, and the
-# file basename of each.
+# Runs tests on a callback. This gets passed an input filehandle, an output
+# filehandle, and the filename each is derived from.
 sub run-tests(
     &test,
-    Str :$input-dir = "t_files/{basename}.input",
-    Str :$output-dir = "t_files/{basename}.output",
+    Str :$input-dir = "t_files/{test-basename}.input",
+    Str :$output-dir = "t_files/{test-basename}.output",
     Int :$tests-per-block = 1,
     Int :$add-to-plan = 0
 ) is export {
