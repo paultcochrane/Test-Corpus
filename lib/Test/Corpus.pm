@@ -30,10 +30,11 @@ sub run-tests(
     plan $tests-per-block * @files + $add-to-plan;
 
     for @files -> $filename {
-        my $in = open("$input-dir/$filename");
-        my $out = open("$output-dir/$filename");
+        my $basename = $filename.path.basename;
+        my $in = open("$input-dir/$basename");
+        my $out = open("$output-dir/$basename");
 
-        &test($in, $out, $filename);
+        &test($in, $out, $basename);
     }
 }
 
