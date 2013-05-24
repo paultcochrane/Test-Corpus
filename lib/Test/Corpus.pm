@@ -2,11 +2,6 @@ module Test::Corpus:auth<github:flussence>:ver<1.0.0>;
 use Test;
 
 sub test-basename {
-    # <!--[if IE]>
-    return ($*PROGRAM_NAME ~~ m{ '/' (<-[/]>+) $ })[0]
-        if $*EXECUTABLE_NAME ~~ /Niecza/;
-    # <![end if]-->
-
     return $*PROGRAM_NAME.path.basename;
 }
 
