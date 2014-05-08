@@ -32,4 +32,4 @@ sub run-tests(
     }
 }
 
-=comment vim: set tw=80 :
+# vim: set tw=80 :
