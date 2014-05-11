@@ -1,9 +1,7 @@
 module Test::Corpus:auth<github:flussence>:ver<1.0.0>;
 use Test;
 
-sub test-basename {
-    return $*PROGRAM_NAME.path.basename;
-}
+constant \test-basename = $*PROGRAM_NAME.path.basename;
 
 # Convenience sub for testing filter functions of arity 1
 sub simple-test(&func) is export {
@@ -22,9 +20,10 @@ sub run-tests(
     Int :$add-to-plan = 0
 ) is export {
     my @files = dir($output-dir);
+
     plan $tests-per-block * @files + $add-to-plan;
 
-    for @files».path».basename -> $basename {
+    for @files».basename -> $basename {
         my $in = open("$input-dir/$basename");
         my $out = open("$output-dir/$basename");
 
