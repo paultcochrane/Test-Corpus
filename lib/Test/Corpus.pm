@@ -1,4 +1,4 @@
-module Test::Corpus:auth<github:flussence>:ver<1.0.0>;
+module Test::Corpus:auth<github:flussence>:ver<1.0.1>;
 use Test;
 
 constant \test-basename = $*PROGRAM_NAME.path.basename;
