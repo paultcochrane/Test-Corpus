@@ -1,33 +1,30 @@
-module Test::Corpus:auth<github:flussence>:ver<1.0.1>;
+module Test::Corpus:auth<github:flussence>:ver<1.1.0>;
 use Test;
 
-constant \test-basename = $*PROGRAM_NAME.path.basename;
-
-# Convenience sub for testing filter functions of arity 1
+#= Convenience sub for testing filter functions of arity 1
 sub simple-test(&func) is export {
-    return sub ($in, $out, $filename) {
-        is &func($in.slurp), $out.slurp, $filename;
+    return sub (IO::Handle $in, IO::Handle $out, Str $testcase) {
+        is &func($in.slurp), $out.slurp, $testcase;
     }
 }
 
-# Runs tests on a callback. This gets passed an input filehandle, an output
-# filehandle, and the filename each is derived from.
+#= Runs tests on a callback. The callback gets passed input/output filehandles,
+#  and the basename of the test file being run.
 sub run-tests(
     &test,
-    Str :$input-dir = "t_files/{test-basename}.input",
-    Str :$output-dir = "t_files/{test-basename}.output",
     Int :$tests-per-block = 1,
-    Int :$add-to-plan = 0
+    Str :$basename        = $*PROGRAM_NAME.path.basename
 ) is export {
-    my @files = dir($output-dir);
+    my @files = dir('t_files/' ~ $basename ~ '.input');
 
-    plan $tests-per-block * @files + $add-to-plan;
+    plan @files * $tests-per-block;
 
-    for @files».basename -> $basename {
-        my $in = open("$input-dir/$basename");
-        my $out = open("$output-dir/$basename");
-
-        &test($in, $out, $basename);
+    for @files -> $input {
+        &test(
+            open($input),
+            open($input.subst('.input/', '.output/')),
+            $input.basename
+        );
     }
 }
 
