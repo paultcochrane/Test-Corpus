@@ -1,5 +1,4 @@
-Test::Corpus
-============
+# Test::Corpus
 
 This is a simple module that automagically iterates over input/output files and calls a callback on
 each pair. Its main use is for testing filter functions produce expected output.

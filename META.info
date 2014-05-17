@@ -1,6 +1,6 @@
 {
     "name"          : "Test-Corpus",
-    "version"       : "1.1.0",
+    "version"       : "1.2.0",
     "author"        : "github:flussence",
     "description"   : "Run a test function against a directory of input and expected output files",
     "depends"       : [],

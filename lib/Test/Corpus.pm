@@ -1,4 +1,5 @@
-module Test::Corpus:auth<github:flussence>:ver<1.1.0>;
+module Test::Corpus:auth<github:flussence>:ver<1.2.0>;
+
 use Test;
 
 #= Convenience sub for testing filter functions of arity 1
@@ -9,23 +10,37 @@ sub simple-test(&func) is export {
 }
 
 #= Runs tests on a callback. The callback gets passed input/output filehandles,
-#  and the basename of the test file being run.
+#  and the basename of the test file being run. Tests are run in no particular
+#  order.
 sub run-tests(
     &test,
-    Int :$tests-per-block = 1,
-    Str :$basename        = $*PROGRAM_NAME.path.basename
+    Int  :$tests-per-block  = 1,
+    Str  :$basename         = $*PROGRAM_NAME.path.basename,
+    Bool :$force-threaded   = False
 ) is export {
     my @files = dir('t_files/' ~ $basename ~ '.input');
 
+    if $tests-per-block > 1 {
+        warn '$tests-per-block is deprecated; please use 1 subtest per block';
+    }
+
     plan @files * $tests-per-block;
 
-    for @files -> $input {
-        &test(
-            open($input),
-            open($input.subst('.input/', '.output/')),
-            $input.basename
-        );
-    }
+    my &runner = &single-test.assuming(&test);
+
+    # Threaded currently doesn't work, and will give you horrible segfaults if
+    # you try to use it.
+    sink $force-threaded
+            ?? await @files».&runner».&start
+            !! @files».&runner».();
+}
+
+my sub single-test(&test, $input) returns Callable {
+    return &test.assuming(
+        open($input),
+        open($input.subst('.input/', '.output/')),
+        $input.basename
+    );
 }
 
 # vim: set tw=80 :
