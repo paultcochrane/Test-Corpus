@@ -16,7 +16,7 @@ sub run-tests(
     &test,
     Int  :$tests-per-block  = 1,
     Str  :$basename         = $*PROGRAM_NAME.path.basename,
-    Bool :$force-threaded   = False
+    Bool :$force-threaded   = %*ENV<TEST_CORPUS_THREADED>.Bool
 ) is export {
     my @files = dir('t_files/' ~ $basename ~ '.input');
 

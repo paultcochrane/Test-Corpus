@@ -5,6 +5,9 @@ each pair. Its main use is for testing filter functions produce expected output.
 
 See the contents of `./t/` and `./t_files/` for an example of how to use.
 
+There's experimental support for threaded tests; set `%*ENV<TEST_CORPUS_THREADED>` to a true value
+to enable it. This can provide big speedups in theory, but is too broken to use by default yet.
+
 * * *
 
 This code is released into the [Public Domain](https://creativecommons.org/publicdomain/zero/1.0/).
