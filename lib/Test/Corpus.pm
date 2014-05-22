@@ -14,8 +14,8 @@ sub simple-test(&func) is export {
 #  order.
 sub run-tests(
     &test,
-    Str  :$basename         = $*PROGRAM_NAME.path.basename,
-    Bool :$force-threaded   = %*ENV<TEST_CORPUS_THREADED>.Bool
+    Str :$basename = $*PROGRAM_NAME.path.basename,
+    Str :$parallel = %*ENV<TEST_CORPUS_PARALLEL> // 'serial'
 ) is export {
     my @files = dir('t_files/' ~ $basename ~ '.input');
 
@@ -30,9 +30,20 @@ sub run-tests(
         );
     }
 
-    sink $force-threaded
-            ?? await @files».&test-closure».&start
-            !! @files».&test-closure».();
+    # Technically these should all work, but right now none do.
+    # (tested on Rakudo 2014.07-6-g8668171aa34a)
+    given $parallel {
+        when 'serial' {
+            @files.map(&test-closure);
+        }
+        when 'hyper' {
+            @files».&test-closure».();
+        }
+        when 'threads' {
+            await @files».&test-closure».&start;
+        }
+        default { ??? }
+    }
 }
 
 # vim: set tw=80 :
