@@ -1,4 +1,4 @@
-module Test::Corpus:auth<github:flussence>:ver<1.2.0>;
+module Test::Corpus:auth<github:flussence>:ver<2.0.0-rc>;
 
 use Test;
 
@@ -14,33 +14,25 @@ sub simple-test(&func) is export {
 #  order.
 sub run-tests(
     &test,
-    Int  :$tests-per-block  = 1,
     Str  :$basename         = $*PROGRAM_NAME.path.basename,
     Bool :$force-threaded   = %*ENV<TEST_CORPUS_THREADED>.Bool
 ) is export {
     my @files = dir('t_files/' ~ $basename ~ '.input');
 
-    if $tests-per-block > 1 {
-        warn '$tests-per-block is deprecated; please use 1 subtest per block';
+    # If you need multiple tests per file, use &Test::subtest
+    plan +@files;
+
+    my sub test-closure($input) {
+        return &test.assuming(
+            open($input),
+            open($input.subst('.input/', '.output/')),
+            $input.basename
+        );
     }
 
-    plan @files * $tests-per-block;
-
-    my &runner = &single-test.assuming(&test);
-
-    # Threaded currently doesn't work, and will give you horrible segfaults if
-    # you try to use it.
     sink $force-threaded
-            ?? await @files».&runner».&start
-            !! @files».&runner».();
-}
-
-my sub single-test(&test, $input) returns Callable {
-    return &test.assuming(
-        open($input),
-        open($input.subst('.input/', '.output/')),
-        $input.basename
-    );
+            ?? await @files».&test-closure».&start
+            !! @files».&test-closure».();
 }
 
 # vim: set tw=80 :
