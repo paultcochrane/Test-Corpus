@@ -1,4 +1,4 @@
-module Test::Corpus:auth<github:flussence>:ver<2.0.0-rc>;
+module Test::Corpus:auth<github:flussence>:ver<2.0.0-rc.2>;
 
 use Test;
 
@@ -17,7 +17,6 @@ sub simple-test(&func) is export {
 sub run-tests(
     &test,
     Str :$basename = $*PROGRAM_NAME.path.basename,
-    Str :$parallel = %*ENV<TEST_CORPUS_PARALLEL> // 'serial'
 ) is export {
     my @files = dir('t_files/' ~ $basename ~ '.input');
 
@@ -32,20 +31,13 @@ sub run-tests(
         );
     }
 
-    # Technically these should all work, but right now none do.
-    # (tested on Rakudo 2014.07-6-g8668171aa34a)
-    given $parallel {
-        when 'serial' {
-            &test-closure($_).() for @files;
-        }
-        when 'hyper' {
-            @files».&test-closure».();
-        }
-        when 'threads' {
-            await @files».&test-closure».&start;
-        }
-        default { ??? }
-    }
+    # This will parallelise in the future, don't make assumptions about order.
+    &test-closure($_).() for @files;
+
+    # Two possible alternatives to the above (note that these both currently
+    # crash in MoarVM, so aren't used):
+    #   @files».&test-closure».();
+    #   await @files».&test-closure».&start;
 }
 
 # vim: set tw=80 :
