@@ -1,4 +1,4 @@
-module Test::Corpus:auth<github:flussence>:ver<2.0.0>;
+module Test::Corpus:auth<github:flussence>:ver<2.0.1>;
 
 use Test;
 
@@ -6,7 +6,7 @@ use Test;
 sub simple-test(&func) is export {
     # ^^ This wants to be "&func:(Str --> Str)"
 
-    return sub (IO::Handle $in, IO::Handle $out, Str $testcase) {
+    return sub (IO::Path $in, IO::Path $out, Str $testcase) {
         is &func($in.slurp), $out.slurp, $testcase;
     }
 }
@@ -25,8 +25,8 @@ sub run-tests(
 
     my sub test-closure($input) {
         return &test.assuming(
-            open($input),
-            open($input.subst('.input/', '.output/')),
+            $input.IO,
+            $input.subst('.input/', '.output/').IO,
             $input.basename
         );
     }
