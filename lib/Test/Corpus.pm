@@ -16,7 +16,7 @@ sub simple-test(&func) is export {
 #  order.
 sub run-tests(
     &test,
-    Str :$basename = $*PROGRAM_NAME.path.basename,
+    Str :$basename = $*PROGRAM_NAME.IO.basename,
 ) is export {
     my @files = dir('t_files/' ~ $basename ~ '.input');
 
